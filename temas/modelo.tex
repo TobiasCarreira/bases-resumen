@@ -1,0 +1,117 @@
+\chapter{Modelo}
+
+\section{Introducción}
+
+Profundizar en \cite{molina2009}, capítulo 1.
+
+\subsection{Niveles de abstracción}
+
+Tenemos tres niveles de abstracción:
+
+\begin{description}
+	\item[Nivel físico] archivos, indices y estructuras de almacenamiento para poder utilizar la base de forma eficiente
+	\item[Modelo conceptual] abstracción del mundo real que la base de datos intenta representar, utilizando conceptos lógicos
+	\item[Vistas] sub-esquema del modelo conceptual, o abstracción de este
+\end{description}
+
+Separar estos tres niveles nos proveen dos independencias relevantes:
+
+\begin{description}
+	\item[Independencia física] capacidad del sistema de ejecutar cambios sobre la definición y estructura de los datos sin que esto afecte la base de datos conceptual
+	\item[Independencia lógica] la capacidad del sistema decambiar el esquema conceptual, sin cambiar la vistalógica que el usuario tiene de los datos. Más difícil de conseguir
+\end{description}
+
+\subsection{Modelo Entidad Relación}
+
+Modelo Entidad Relación (MER) es un modelo conceptual de alto nivel, representando entidades del mundo real y sus relaciones. El Diagrama Entidad Relación (DER) es la herramienta
+gráfica que permite visualizar las entidades del modelo y
+sus relaciones.
+
+\begin{description}
+	\item[Entidad] cosa del mundo real que tiene una existencia independiente. Se agrupan en clases o tipos de entidades.
+	\item[Relación] asociación entre entidades. Tienen una aridad (unaria, binaria, ternaria) y cardinalidad (uno a uno, uno a muchos, muchos a muchos). Pueden ser parciales (opcionales) o totales.
+	\item[Atributo] propiedad perteneciente a una entidad o a una relación muchos a muchos. Puede ser simple, compuesto o derivado (aunque solo los simples terminan modelándose de forma directa).
+	\item[Llaves] grupo de atributos que identifica a una entidad. Identifican unívocamente a cada individuo de una clase.
+\end{description}
+
+El MER puede mapearse a tablas en el Modelo Relacional.
+
+\subsection{Modelo Relacional}
+
+Los registros se abstraen en \textbf{relaciones} (tablas). Cada registro en una relación se denomina \textbf{tupla} (filas). El orden entre las tuplas no está especificado. La fila cuenta con varios atributos (columnas), y cada uno tiene un dominio.
+
+\begin{description}
+	\item[Esquema de base de datos] colección (no vacía y finita) de esquemas de relación
+	\item[Esquema de relación] consiste de un nombre y un conjunto finito de atributos (columnas).
+\end{description}
+
+\section{Lenguajes de consulta}
+
+Profundizar en \cite{elmasri2015}, capítulo 8 (o capítulo 6 de la 6ta edición).
+
+\subsection{Álgebra Relacional}
+
+\begin{description}
+	\item[Álgebra] dominio + operaciones de aridad finita + axiomas
+\end{description}
+
+El Álgebra Relacional es un lenguaje formal para consultas sobre un modelo relacional. Es la base para pensar optimizaciones de consultas. Es \textbf{procedural}. Las operaciones toman relaciones y devuelven relaciones.
+
+Operadores:
+
+\begin{description}
+	\item[SELECT] $\sigma_{<condicion>}(R)$ filtra (partición horizontal). Es un operador unario. Es conmutativa y se pueden simplificar dos SELECTs uniendo las condiciones con un AND (cascada)
+	\item[PROJECT] $\pi_{<lista de atributos>}(R)$ se queda con un subconjunto de columnas (partición vertical). Operación unaria. \textbf{Remueve duplicados}
+	\item[RENAME] $\rho(S, R)$ o $\rho(S(A_1 \to B_1, ..., A_n \to B_n), R)$ renombra una relación o sus columnas
+	\item[Operaciones de conjuntos] unión $R \cup S$, intersección $R \cap S$, diferencia $R - S$. Deben ser unión compatibles (las columnas matchean en tipo)
+	\item[PRODUCTO CARTESIANO] $R \times S$ combina cada tupla de una relacióncon cada una de las tuplas de la otra relación
+	\item[JOIN] $R \bowtie_{<condicion>} S$ producto cartesiano + filtro por condición con columnas de ambas relaciones
+	\item[NATURAL JOIN] unifica dos relaciones usando las columnas que comparten nombre
+	\item[OUTER JOIN] conserva tuplas que están en alguna de las relaciones pero no matchean con ninguna de la otra relación (completando atributos faltantes con NULL)
+	\item[DIVISION] $R \div S$ retorna las tuplas de R que se encuentran emparejadas con TODAS las tuplas de S. Requiere que $atributos(S) \subseteq atributos(R)$. Resultado contiene los atributos de R no compartidos con S. Se puede expresar con otras operaciones, no suele implementarse en SQL
+\end{description}
+
+\subsection{Cálculo Relacional de Tuplas}
+
+A diferencia de AR, CRT es declarativo: el lenguaje permite expresar cómo es el conjunto de respuestas quebuscamos, las caracteristicas de las tuplas que deben estar en la respuesta. SQL se basa en CRT.
+
+Las consultas se escriben en la forma $\{t | COND(t)\}$ donde $t$ es de tipo tupla y $COND$ es un predicado (fórmula bien formada) cuya única variable libre debe ser $t$. Las fórmulas bien formadas permiten:
+
+\begin{itemize}
+	\item Ver pertenencia a una relación
+	\item Comparar atributos de relaciones con literales u otros atributos de relaciones
+	\item Operaciones básicas de lógica proposicional y de primer orden
+\end{itemize}
+
+\subsection{Expresividad de los Lenguajes de Consulta}
+
+\begin{description}
+	\item[Expresividad] amplitud de ideas que pueden ser representadas y comunicados en un lenguaje. En un lenguaje de consultas, equivale al conjunto de consultas que nos permite hacer
+\end{description}
+
+CRT es una especialización de la Lógica de Primer Orden aplicada a bases de datos. No requiere teoría de modelos, ya que sólo interesa saber la validez de una fórmula en un modelo puntual: el esquema de la base de datos.
+
+CRT es equivalente a AR si nos restringimos a las \textbf{expresiones seguras}. Estas son las que garantizan producir una \textbf{cantidad finita de tuplas como resultado}. Una forma alternativa de verlo es que los valores en el resultado son parte del dominio de la expresión (son constantes en la consulta, o aparecen en alguna tupla de alguna de las relaciones referenciadas en esta).
+
+No todo es expresable en estos lenguajes: algunos requieren recursión/iteración (ejemplo, camino de largo desconocido en un grafo). No se pueden expresar sentencias en LPO con n cuantificadores anidados para cualquier n natural. Existen herramientas matemáticas que permiten demostrar
+que ciertas propiedades (consultas) no son expresables enLPO: \textbf{Teorema Ehrenfeucht-Fraisse}.
+
+SQL se basa en CRT con expresiones seguras, pero se suele agregar:
+
+\begin{itemize}
+	\item Recursión
+	\item Agrupamiento y agregación
+	\item Operaciones aritméticas
+\end{itemize}
+
+\section{Normalización}
+
+Profundizar en \cite{elmasri2015}, capítulo 15 (hasta 15.5 inclusive).
+
+\subsection{Pautas de diseño}
+
+\subsection{Formas normales}
+
+\section{Datos semi estructurados - XML}
+
+\section{Datos abiertos}
