@@ -132,7 +132,7 @@ Profundizar en \cite{elmasri2015}, capítulo 15 (hasta 15.5 inclusive).
 ¿Qué problemas podría presentar un esquema?
 
 \begin{description}
-	\item[Anomalías de inserción:] Cuando se tienen atributos no pertinentes o aglomerados en una relación, es posible que en la inserción algunos de estos deban llevar NULL.
+	\item[Anomalías de inserción:] Cuando se tienen atributos no pertinentes o aglomerados en una relación, es posible que en la inserción algunos de estos deban llevar NULL o agregar redundancia (que puede dar origen a inconsistencias)
 	\item[Anomalías de actualización:] por redundancia, se debe actualizar varias veces el mismo valor en distintos lugares.
 	\item[Anomalías de borrado:] puede ocurrir pérdida de información debido a que queremos borrar algo específico, pero el esquema de relación tiene más información.
 \end{description}
@@ -144,9 +144,7 @@ Todo esto surge de tener información redundante.
 Propiedades deseables:
 
 \begin{description}
-	\item[Nonadditive Join (Lossless Join):] garantía de que no ocurre problema de
-generación de tuplas espúreas. La relación original tiene que poder ser
-recuperada de la descomposición.
+	\item[Nonadditive Join (Lossless Join):] garantía de que no ocurre problema de generación de tuplas espúreas. La relación original tiene que poder ser recuperada de la descomposición.
 	\item[Preservación de DF:] garantía de que cada DF se encuentra representada en algún esquema resultante de la descomposición
 \end{description}
 

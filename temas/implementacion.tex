@@ -2,7 +2,39 @@
 
 \section{Transacciones}
 
-Conflicto equivalencia: dos historias $H_1$ y $H_2$ son conflicto equivalentes si tienen las mismas transacciones y elorden de las operaciones en conflicto de las transacciones no abortadas es el mismo.
+Una transacción es un conjunto de instrucciones que forman una unidad lógica de procesamiento.
+
+La base de datos está compuesta por items, que pueden ser registros, atributos, bloques de memoria.
+Cada item tiene un identificador único (que no necesita ser conocido por el programador).
+Una transacción es una secuencia de lecturas y escrituras de items.
+
+\begin{description}
+	\item[read-set:] conjunto de items leídos por una transacción
+	\item[write-set:] conjunto de items escritos por una transacción
+\end{description}
+
+Problemas comunes:
+
+\begin{description}
+	\item[Lost Update:] T1 lee X, T2 lee X, T1 escribe X usando el valor que leyó, T2 escribe X usando el valor que leyó
+	\item[Dirty Read:] leo algo que luego es abortado y rollbackeado
+	\item[Incorrect Summary:] T1 modifica algo que T2 estaba sumarizando y T2 obtiene mal el resultado
+	\item[Unrepeatable read:] Ocurre cuando dentro de una transacción, dos reads (uno atrás del otro o sin modificar los datos), leen diferentes valores del mismo dato
+\end{description}
+
+Una Transacción T alcanza su punto de commit cuando: operaciones ejecutadas correctamente y grabadas en el log.
+
+Propiedades ACID:
+
+\begin{description}
+	\item[Atomicidad:] una transacción es una unidad atómica. Responsabilidad del subsistema de recovery
+	\item[Consistencia:] una transacción mueve la BD de un estado consistente a otro. Responsabilidad dividida entre el programador y el módulo de restricciones de integridad del DBMS
+	\item[Aislamiento:] las transacciones no deben interferir entre ellas. Deben correr como si fueran la única transacción en el sistema. Impuesto por el subsistema de concurrencia
+	\item[Durabilidad:] los cambios commiteados deben persistir en la BD. Responsabilidad del subsistema de recovery
+\end{description}
+
+Conflicto equivalencia: dos historias $H_1$ y $H_2$ son conflicto equivalentes si tienen las mismas transacciones y el
+orden de las operaciones en conflicto de las transacciones no abortadas es el mismo.
 
 Historia recuperable: Si $T_i$ lee de $T_j$ y $T_i$ commitea, entonces $c_i > c_j$
 
@@ -52,15 +84,7 @@ Sorted merge join: se ordenan ambas tablas (o ya están ordenadas por un indice)
 
 Problemas:
 
-dirty read: leo algo que luego es abortado y rollbackeado
-
-lost update: T1 lee X, T2 lee X, T1 escribe X usando el valor que leyo, T2 escribe X usando el valor que leyo
-
 Phantom read: hago dos selects iguales en la misma transaccion y dan conjuntos de tuplas distintos
-
-Incorrect summary: T1 modifica algo que T2 estaba sumarizando y T2 obtiene mal el resultado
-
-Unrepeatable read: Ocurre cuando dentro de una transacción, dos reads (uno atrás del otro osin modificar los datos), leen diferentes valores del mismo dato
 
 Historia serializable: (conflicto) equivalente a una serial. Para chequear se hace digrafo de precedencia (operaciones en conflicto entre transacciones) y no tiene que tener ciclos.
 
