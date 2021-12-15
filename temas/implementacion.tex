@@ -33,15 +33,6 @@ Propiedades ACID:
 	\item[Durabilidad:] los cambios commiteados deben persistir en la BD. Responsabilidad del subsistema de recovery
 \end{description}
 
-Conflicto equivalencia: dos historias $H_1$ y $H_2$ son conflicto equivalentes si tienen las mismas transacciones y el
-orden de las operaciones en conflicto de las transacciones no abortadas es el mismo.
-
-Historia recuperable: Si $T_i$ lee de $T_j$ y $T_i$ commitea, entonces $c_i > c_j$
-
-Avoid cascaiding Aborts: se leen solo datos ya commiteados. De esa forma se pueden evitar los dirty reads sin abortar como en RC.
-
-Historia estricta: no lee ni escribe un item que fue escrito por una transacción que no commiteó.
-
 \section{NoSQL}
 
 \begin{description}
@@ -52,13 +43,71 @@ Sharding: metodología que distribuye filas de una misma tabla en distintos nodo
 
 BASE:
 
-Basic Availability: siempre se puede responder consultas (no se cae)
+\begin{description}
+	\item[Basic Availability:] se intenta poder responder consultas lo más posible (sistema altamente distribuido)
+	\item[Soft state:] cambios sin necesidad de entradas nuevas
+	\item[Eventual consistency]: la base de datos debe converger en algún momento a un estado único
+\end{description}
 
-Soft state: cambios sin necesidad de entradas nuevas
+CAP: solo se puede cumplir dos de tres
 
-Eventual consistency
+\begin{description}
+	\item[Consistencia:] una única copia de los datos consistente
+	\item[Disponibilidad/Availability:] cada solicitud devuelve una respuesta
+	\item[Tolerancia a particiones:] el sistema sigue funcionando sin importar la cantidad de mensajes que se pierdan o retrasen en la red
+\end{description}
 
-CAP: de consistencia, availability, partition tolerance solo podes tener dos
+Las bases de datos NoSQL suelen no tener esquema. Existen diferentes tipos.
+
+\subsection{Clave-Valor}
+
+\begin{itemize}
+	\item diccionario donde el valor puede ser potencialmente cualquier cosa
+	\item muy simples, escalan fácilmente pero no aceptan consultas complejas
+	\item items pueden almacenarse en ``dominios'' que son similares a las tablas, con la única diferencia que no tienen un esquema
+	\item pueden producir mucha redundancia
+	\item no existe integridad referencial (por ejemplo, quizá hay claves guardadas que llevan a items que fueron borrados)
+	\item adecuadas para objetos
+\end{itemize}
+
+\subsection{Documentos}
+
+\begin{itemize}
+	\item diccionario clave-valor, pero ahora el valor es un documento semi-estructurado (XML, JSON), sin tener necesariamente un esquema
+	\item pueden generar metadata para indexar
+\end{itemize}
+
+Un ejemplo es MongoDB:
+
+\begin{itemize}
+	\item permite \textbf{fragmentación horizontal o sharding}: se distribuyen las filas en varios nodos según rangos de la clave
+	\item permite operaciones complejas estilo map/reduce/group by/regex
+\end{itemize}
+
+\subsection{Familia de columnas}
+
+\begin{description}
+	\item[Familia de columnas estándar:] cada item tiene una clave y un conjunto de columnas (clave+valor)
+	\item[Familia de columnas super:] cada item tiene una clave y un conjunto de conjuntos de columnas
+\end{description}
+
+\begin{itemize}
+	\item están pensadas para grandes cantidades de datos
+	\item permiten partición vertical
+	\item permiten indexación
+	\item soporta datos semi-estructurados
+	\item no son adecuadas para datos relacionales
+	\item no proveen consistencia inmediata
+\end{itemize}
+
+\subsection{Grafos}
+
+\begin{itemize}
+	\item datos almacenados en nodos
+	\item relaciones dirigidas y tipadas en ejes
+	\item permite atributos tanto en nodos como en ejes
+	\item ejemplo: Neo4j, cumple ACID y soporta lenguajes de consulta especiales
+\end{itemize}
 
 \section{Optimización de consultas}
 
@@ -85,6 +134,15 @@ Sorted merge join: se ordenan ambas tablas (o ya están ordenadas por un indice)
 Problemas:
 
 Phantom read: hago dos selects iguales en la misma transaccion y dan conjuntos de tuplas distintos
+
+Conflicto equivalencia: dos historias $H_1$ y $H_2$ son conflicto equivalentes si tienen las mismas transacciones y el
+orden de las operaciones en conflicto de las transacciones no abortadas es el mismo.
+
+Historia recuperable: Si $T_i$ lee de $T_j$ y $T_i$ commitea, entonces $c_i > c_j$
+
+Avoid cascaiding Aborts: se leen solo datos ya commiteados. De esa forma se pueden evitar los dirty reads sin abortar como en RC.
+
+Historia estricta: no lee ni escribe un item que fue escrito por una transacción que no commiteó.
 
 Historia serializable: (conflicto) equivalente a una serial. Para chequear se hace digrafo de precedencia (operaciones en conflicto entre transacciones) y no tiene que tener ciclos.
 
