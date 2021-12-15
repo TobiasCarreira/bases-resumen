@@ -2,12 +2,86 @@
 
 \section{Transacciones}
 
+Conflicto equivalencia: dos historias $H_1$ y $H_2$ son conflicto equivalentes si tienen las mismas transacciones y elorden de las operaciones en conflicto de las transacciones no abortadas es el mismo.
+
+Historia recuperable: Si $T_i$ lee de $T_j$ y $T_i$ commitea, entonces $c_i > c_j$
+
+Avoid cascaiding Aborts: se leen solo datos ya commiteados. De esa forma se pueden evitar los dirty reads sin abortar como en RC.
+
+Historia estricta: no lee ni escribe un item que fue escrito por una transacción que no commiteó.
+
 \section{NoSQL}
+
+\begin{description}
+	\item[Basadas en documentos:] cada entrada es un documento, sin esquema pero con algún formato (semi estructurado). Ejemplo: JSONs en MongoDB
+\end{description}
+
+Sharding: metodología que distribuye filas de una misma tabla en distintos nodos. Es fragmentación horizontal.
+
+BASE:
+
+Basic Availability: siempre se puede responder consultas (no se cae)
+
+Soft state: cambios sin necesidad de entradas nuevas
+
+Eventual consistency
+
+CAP: de consistencia, availability, partition tolerance solo podes tener dos
 
 \section{Optimización de consultas}
 
+Indice denso: tiene una entrada por cada registro de la BD. No es denso si tiene puntero a bloque en el que tenes que buscar.
+
+Optimizaciones algebraicas:
+
+Hacer proyecciones y selecciones lo antes posible (mas en las hojas).
+
+Aplicar primero los joins mas selectivos
+
+Cambiar producto cartesiano + seleccion por join
+
+Hacer primero las selecciones más selectivas
+
+Selectividad: proporción de tuplas que cumplen la condición.
+
+Hacer seleccion de relaciones y luego producto cartesiano en vez de producto cartesiano y luego seleccion: $\sigma(R \times S) = \sigma(R) \times \sigma(S)$
+
+Sorted merge join: se ordenan ambas tablas (o ya están ordenadas por un indice) y se mergea como en merge sort.
+
 \section{Concurrencia}
+
+Problemas:
+
+dirty read: leo algo que luego es abortado y rollbackeado
+
+lost update: T1 lee X, T2 lee X, T1 escribe X usando el valor que leyo, T2 escribe X usando el valor que leyo
+
+Phantom read: hago dos selects iguales en la misma transaccion y dan conjuntos de tuplas distintos
+
+Incorrect summary: T1 modifica algo que T2 estaba sumarizando y T2 obtiene mal el resultado
+
+Unrepeatable read: Ocurre cuando dentro de una transacción, dos reads (uno atrás del otro osin modificar los datos), leen diferentes valores del mismo dato
+
+Historia serializable: (conflicto) equivalente a una serial. Para chequear se hace digrafo de precedencia (operaciones en conflicto entre transacciones) y no tiene que tener ciclos.
+
+Timestamping con multiversion: busca evitar \textbf{read too late}, al escribir no se pisa el registro sino que se crea una nueva versión y se le asigna un timestamp. Asi, si una transacción más vieja quiere leer un registro que fue escrito por una transacción mas nueva, puede leer la versión correspondiente. No evita aborts en cascada ni write too late.
 
 \section{Recuperación}
 
+Politica Undo+Redo: Hace undo de las transacciones incompletas y luego redo de las transacciones commiteadas en el log. Las filas del log tienen las escrituras con valor viejo y valor nuevo para poder hacer redo.
+
+Checkpoint quiescente: no permite nuevas transacciones hasta que terminen las que estaban pendientes de commitear.
+
+Checkpoint no quiescente: permite nuevas transacciones, solo espera a las que estaban pendientes de antes para terminar el checkpoint.
+
 \section{Bases distribuidas}
+
+Sistemas de replicacion:
+
+master/slave
+
+peer to peer
+
+Homogéneo: todos los nodos corren el mismo software (o compatible), y comparten esquemas.
+
+Heterogéneo: cada nodo usa software y esquema distinto y colaboran de forma limitada.
