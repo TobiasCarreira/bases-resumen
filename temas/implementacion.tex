@@ -111,23 +111,52 @@ Un ejemplo es MongoDB:
 
 \section{Optimización de consultas}
 
-Indice denso: tiene una entrada por cada registro de la BD. No es denso si tiene puntero a bloque en el que tenes que buscar.
+El optimizador recibe una expresión algebraica de la consulta y devuelve un plan de ejecución eficiente.
+Puede haber múltiples planes posibles ya que se puede \textbf{reescribir la expresión de formas lógicamente equivalentes} y porque hay expresiones que cuentan con \textbf{múltiples algoritmos posibles}.
 
-Optimizaciones algebraicas:
+Una consulta SQL puede ser expresada en un árbol de expresión en AR donde las hojas son las relaciones y los nodos internos son operaciones.
+El árbol canónico es el inicial, no optimizado.
 
-Hacer proyecciones y selecciones lo antes posible (mas en las hojas).
+\subsection{Índices}
 
-Aplicar primero los joins mas selectivos
+Estructura adicional que permite el acceso eficiente según algún atributo.
 
-Cambiar producto cartesiano + seleccion por join
+Tipos de índices:
 
-Hacer primero las selecciones más selectivas
+\begin{description}
+	\item[Clustered:] los datos del archivo están físicamente en el mismo orden que el índice (solo puede haber uno por tabla)
+	\item[Denso:] tiene una entrada de índice por cada valor posible de la clave
+	\item[Primario:] tiene todos los registros completos de los archivos (vs tener solo el id de fila)
+\end{description}
 
-Selectividad: proporción de tuplas que cumplen la condición.
+Organización de archivos:
 
-Hacer seleccion de relaciones y luego producto cartesiano en vez de producto cartesiano y luego seleccion: $\sigma(R \times S) = \sigma(R) \times \sigma(S)$
+\begin{description}
+	\item[Heap:] colección desordenada de registros, agrupados en bloques
+	\item[Sorted:] colección ordenada con respecto a uno de los atributos
+	\item[Árbol B+ (de orden d):] es un árbol balanceado, tiene entre d/2 y d claves por nodo interno. Las hojas tienen los datos (o id de fila si son unclustered), es eficiente para consultas por rangos
+	\item[Hash estático:] tabla con cantidad fija de buckets. Cada bucket es una lista enlazada. Ideal para búsquedas por igualdad
+\end{description}
 
-Sorted merge join: se ordenan ambas tablas (o ya están ordenadas por un indice) y se mergea como en merge sort.
+
+\subsection{Optimizaciones algebraicas}
+
+\begin{itemize}
+	\item Hacer proyecciones y selecciones lo antes posible (mas en las hojas).
+	\item Aplicar primero los joins mas selectivos
+	\item Cambiar producto cartesiano + seleccion por join
+	\item Hacer primero las selecciones más selectivas (Selectividad: proporción de tuplas que cumplen la condición)
+	\item Hacer seleccion de relaciones y luego producto cartesiano en vez de producto cartesiano y luego seleccion: $\sigma(R \times S) = \sigma(R) \times \sigma(S)$
+	\item VER MAS EN LA TEÓRICA
+\end{itemize}
+
+\subsection{Algoritmos de Join}
+
+\begin{description}
+	\item[Block Nested Loops Join (BNLJ):] dos loops (uno por cada relación a juntar) anidados y un if para la condición
+	\item[Index Nested Loops Join (INLJ):] dos loops anidados, pero ahora en vez de hacer if, el loop interno se hace sobre el resultado de la búsqueda en un índice correspondiente al atributo de la junta
+	\item[Sorted Merge Join (SMJ):] se ordenan ambas tablas (o ya están ordenadas por un indice) y se mergea como en merge sort. El resultado queda ordenado por el atributo de la junta
+\end{description}
 
 \section{Concurrencia}
 
