@@ -18,8 +18,8 @@ Problemas comunes:
 \begin{description}
 	\item[Lost Update:] T1 lee X, T2 lee X, T1 escribe X usando el valor que leyó, T2 escribe X usando el valor que leyó
 	\item[Dirty Read:] leo algo que luego es abortado y rollbackeado
-	\item[Incorrect Summary:] T1 modifica algo que T2 estaba sumarizando y T2 obtiene mal el resultado
 	\item[Unrepeatable read:] Ocurre cuando dentro de una transacción, dos reads (uno atrás del otro o sin modificar los datos), leen diferentes valores del mismo dato
+	\item[Incorrect Summary:] T1 modifica algo que T2 estaba sumarizando y T2 obtiene mal el resultado
 \end{description}
 
 Una Transacción T alcanza su punto de commit cuando: operaciones ejecutadas correctamente y grabadas en el log.
@@ -138,7 +138,6 @@ Organización de archivos:
 	\item[Hash estático:] tabla con cantidad fija de buckets. Cada bucket es una lista enlazada. Ideal para búsquedas por igualdad
 \end{description}
 
-
 \subsection{Optimizaciones algebraicas}
 
 \begin{itemize}
@@ -192,7 +191,8 @@ Profundizar en capítulo 21 de \cite{elmasri2015}.
 
 Problemas:
 
-Phantom read: hago dos selects iguales en la misma transaccion y dan conjuntos de tuplas distintos
+Lost Update
+Phantom Read: hago dos selects iguales en la misma transaccion y dan conjuntos de tuplas distintos
 
 Locks
 
@@ -200,17 +200,59 @@ Timestamping
 
 Timestamping con multiversion: busca evitar \textbf{read too late}, al escribir no se pisa el registro sino que se crea una nueva versión y se le asigna un timestamp. Asi, si una transacción más vieja quiere leer un registro que fue escrito por una transacción mas nueva, puede leer la versión correspondiente. No evita aborts en cascada ni write too late.
 
-Niveles Aislamiento en SQL
+Niveles Aislamiento en SQL (cada nivel es más estricto que los anteriores):
+
+\begin{description}
+	\item[READ UNCOMMITED:] previene Lost Updates
+	\item[READ COMMITED:] previene Dirty Reads
+	\item[REPEATABLE READS:] previene Non Repeatable Reads
+	\item[SERIALIZABLE:] previene Phantom Reads
+\end{description}
 
 \section{Recuperación}
 
-Politica Undo+Redo: Hace undo de las transacciones incompletas y luego redo de las transacciones commiteadas en el log. Las filas del log tienen las escrituras con valor viejo y valor nuevo para poder hacer redo.
+\subsection{Política Undo}
 
-Checkpoint quiescente: no permite nuevas transacciones hasta que terminen las que estaban pendientes de commitear.
+Por cada item a escribir, primero se registra en el log y luego se escribe en disco.
+Se agrega COMMIT al log luego de escribit todos los cambios a disco.
+Para recuperarse, se recorre el log desde el principio y se van deshaciendo las transacciones incompletas (no commiteadas ni abortadas).
 
-Checkpoint no quiescente: permite nuevas transacciones, solo espera a las que estaban pendientes de antes para terminar el checkpoint.
+\subsection{Política Redo}
+
+Se registran los cambios y el COMMIT en el log, luego se bajan los cambios a disco.
+Para recuperarse, se rehacen las transacciones commiteadas.
+Como no se bajan los cambios a disco hasta luego del commit, requiere más buffer en memoria.
+
+\subsection{Política Undo/Redo}
+
+Las filas del log tienen las escrituras con valor viejo y valor nuevo para poder hacer redo.
+Se escribe en el log antes de bajar el cambio a disco.
+Para recuperarse, aplica Redo a las commiteadas y luego Undo a las incompletas.
+
+\subsection{Checkpoints}
+
+\begin{description}
+	\item[Checkpoint quiescente:] no permite nuevas transacciones hasta que terminen las que estaban pendientes de commitear
+	\item[Checkpoint no quiescente:] permite nuevas transacciones, solo espera a las que estaban pendientes de antes para terminar el checkpoint
+\end{description}
 
 \section{Bases distribuidas}
+
+Al distribuir una base de datos, a la independencia entre datos físicos y lógicos se agregan:
+
+\begin{description}
+	\item[Organización de los datos:] no debe ser necesario conocer detalles de la red ni la ubicación de los datos. Tiene dos subcasos:
+	\begin{description}
+		\item[Transaparencia de ubicación:] independencia entre ubicación de los datos y dónde se lanza la consulta
+		\item[Transparencia de nombre:] con saber el nombre del objeto a referenciar debe ser suficiente, no hace falta saber su ubicación
+	\end{description}
+	\item[Fragmentación:] no debe hacer falta conocer la existencia de fragmentos
+	\begin{description}
+		\item[Horizontal (sharding):] distribuye la tabla en subconjuntos de filas
+		\item[Vertical:] distribuye la tabla en subconjuntos de columnas
+	\end{description}
+	\item[Replicación:] almacenar datos en varios lugares para mejorar disponibilidad, performance, confiabilidad. El usuario no debe necesitar la conocer la existencia de copias
+\end{description}
 
 Sistemas de replicacion:
 
