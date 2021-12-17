@@ -254,6 +254,35 @@ Al distribuir una base de datos, a la independencia entre datos físicos y lógi
 	\item[Replicación:] almacenar datos en varios lugares para mejorar disponibilidad, performance, confiabilidad. El usuario no debe necesitar la conocer la existencia de copias
 \end{description}
 
+Propiedades deseables:
+
+\begin{description}
+	\item[Disponibilidad/Confiabilidad:] probabilidad de que un sistema se encuentre operando (son conceptos diferentes pero muy similares)
+	\item[Escalabilidad:] medida en que un sistema puede expandir su capacidad mientras continúa operando. Puede ser:
+	\begin{description}
+		\item[Horizontal:] expandir la cantidad de nodos
+		\item[Vertical:] expandir la capacidad de un nodo individual
+	\end{description}
+	\item[Tolerancia a partición:] que el sistema siga funcionando a pesar de que la red se particione
+	\item[Autonomía:] en qué medida nodos individuales pueden operar independientemente
+\end{description}
+
+\subsection{Control de Concurrencia}
+
+Si un item se encuentra replicado en varios nodos, debe controlarse para mantener la consistencia.
+
+\begin{description}
+	\item[Copia distinguida:] se designa una copia de cada data item como copia distinguida. Pedidos de lock y unlock enviados al sitio de la copia distinguida. Existen 3 variantes:
+	\begin{description}
+		\item[Sitio primario:] todas las copias primarias se encuentran en el mismo sitio. 2PC garantiza seriabilidad. Genera un cuello de botella y punto único de falla
+		\item[Sitio primario + Backup:] hay un segundo nodo que actúa como backup. La información de los locks se mantiene en ambos sitios, disminuyendo la performance. Si se cae el sitio primario, el backup toma el control
+		\item[Copia primaria:] admite copias distinguidad en diferentes sitios. Elimina el cuello de botella, y si un sitio falla, solo se ven afectadas las transacciones que necesitan un lock de ese sitio. Puede sumarse backup
+	\end{description}
+	\item[Votación:] se pide lock a todos los sitios con una copia del item. Se consigue el lock si la mayoría de sitios dan el OK. Implica mayor cantidad de mensajes y se complejiza teniendo en cuenta que algunos sitios pueden caerse durante la votación
+\end{description}
+
+2PC vs 3PC
+
 Sistemas de replicacion:
 
 master/slave

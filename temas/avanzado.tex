@@ -14,6 +14,18 @@ herencia
 
 \section{Interoperabilidad}
 
+\subsection{Data Warehouse}
+
+Es un copia de datos transaccionales de un tema específico, puede integrar distintas bases de datos. Se organiza para facilitar las consultas y el análisis. Puede incluir valores sumarizados y derivados.
+
+ETL y ELT son procedimientos para armas DW a partir de fuentes operacionales.
+
+\begin{description}
+	\item[Extracción (migración + limpieza):] se copian los datos a un área de trabajo y se limpian (manejo de outliers, de missings, estandarización)
+	\item[Transformación:] adapta los datos al modelo lógico del DW mediante una serie de reglas. Suele des-normalizarse/agregar sumarizaciones aunque debe existir alguna forma de navegar los datos hasta el nivel de detalle (drill down)
+	\item[Load:] se cargan los datos transformados en las tablas del DW
+\end{description}
+
 \section{Ontologías}
 
 \section{Calidad y gobierno de datos}
