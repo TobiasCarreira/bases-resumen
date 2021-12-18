@@ -16,7 +16,14 @@ herencia
 
 \subsection{Data Warehouse}
 
-Es un copia de datos transaccionales de un tema específico, puede integrar distintas bases de datos. Se organiza para facilitar las consultas y el análisis. Puede incluir valores sumarizados y derivados.
+Gran base de datos preprocesados con una finalidad. Es un conjunto de datos transaccionales de un tema específico, puede integrar distintas bases de datos. Se organiza para facilitar las consultas y el análisis. Puede incluir valores sumarizados y derivados.
+
+\begin{description}
+	\item[OLTP:] online transaction process, datos operacionales, preparadas para tareas cortas, permite transacciones eficientes
+	\item[OLAP:] online analytical process, preparadas para grandes consultas. Se organiza por tema
+\end{description}
+
+Metadata: debe documentarse toda la información de generación del DW. Fuentes de datos, transformaciones, reglas de limpieza, etc
 
 ETL y ELT son procedimientos para armas DW a partir de fuentes operacionales.
 
@@ -25,6 +32,22 @@ ETL y ELT son procedimientos para armas DW a partir de fuentes operacionales.
 	\item[Transformación:] adapta los datos al modelo lógico del DW mediante una serie de reglas. Suele des-normalizarse/agregar sumarizaciones aunque debe existir alguna forma de navegar los datos hasta el nivel de detalle (drill down)
 	\item[Load:] se cargan los datos transformados en las tablas del DW
 \end{description}
+
+ELT replica los datos (hace un espejo) leyendo logs antes de transformarlos.
+
+Para modelar un DW, debe tenerse una idea de las preguntas frecuentes que se le harán a los datos.
+Modelo dimensional: se tienen hechos (entidades principales) con varias dimensiones (tiempo, lugar, usuario) y una métrica asignada para cada posible valor de las dimensiones, formando un hipercubo.
+Las dimensiones pueden tener jerarquías: el tiempo se divide en años, que se dividen en meses, que se dividen en días.
+Operaciones comunes:
+
+\begin{description}
+	\item[Roll up:] sumarizar por una dimensión
+	\item[Drill down:] desagregar
+	\item[Slice:] quedarse con un subconjunto del hipercubo, filtrar por un único valor de una dimensión
+	\item[Dice:] como slices, pero puede ser con más dimensiones y más valores por dimensión
+\end{description}
+
+Suele usarse almacenamiento por columna ya que uno se interesa en algunas de columnas y no el registro entero
 
 \section{Ontologías}
 
