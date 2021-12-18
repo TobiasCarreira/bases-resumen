@@ -30,6 +30,37 @@ ETL y ELT son procedimientos para armas DW a partir de fuentes operacionales.
 
 \section{Calidad y gobierno de datos}
 
+Existen datos en formatos muy diversos: tablas, documentos, grafos, streams (IoT)
+
+\begin{description}
+	\item[Calida de datos:] que tan bien reflejan la realidad
+\end{description}
+
+Problemas:
+
+\begin{itemize}
+	\item Datos erróneos, nulls con múltiples significados, malos defaults, combinaciones de atributos que son posibles pero sospechosos
+	\item Datos poco informativos (muchas filas con valor "otro")
+	\item Datos desactualizados
+	\item Datos no consistentes entre distintas tablas/bases
+	\item Distintos formatos no estandarizados (calles, fechas), distintas unidades
+	\item Datos que no cumplen restricciones (fuera de rango, fuera de las opciones validas)
+	\item Sesgos en los datos
+\end{itemize}
+
+Qué hacer:
+
+\begin{itemize}
+	\item análisis estadístico, detección de outliers
+	\item no permitir que la base de datos se contamine con datos incorrectos, investigar si corresponde agregarlo
+\end{itemize}
+
+Problemas éticos: la información errónea puede afectar la vida de las personas
+
+\begin{description}
+	\item[Gobierno de datos:] desarrollo y ejecución de arquitecturas, prácticas y procedimientos que manejan adecuadamente las necesidades del ciclo de vida de los datos. Incluyen calidad, arquitectura, seguridad, metadata. Es tanto responsabilidad de sistemas (arquitectura, infra) como del negocio (dueño de datos, definición de los datos)
+\end{description}
+
 \section{Seguridad}
 
 \section{Mineria de datos}
