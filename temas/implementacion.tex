@@ -189,16 +189,24 @@ Tipos de Historias:
 
 Profundizar en capítulo 21 de \cite{elmasri2015}.
 
-Problemas:
+\subsection{Locking}
 
-Lost Update
-Phantom Read: hago dos selects iguales en la misma transaccion y dan conjuntos de tuplas distintos
+\begin{description}
+	\item[2 phase locking:] hay una fase de tomar locks y otra de liberar. Luego de liberar el primer lock, no se puede volver a tomar otro. Asegura seriabilidad pero puede tener deadlocks
+	\item[2PL estricto:] se liberan los locks de escritura luego del commit. Asegura ACA y ST. Puede tener deadlocks
+	\item[2PL riguroso:] libera todos los locks luego del commit. El orden de los commits es el orden de serialización. Puede tener deadlocks
+	\item[2PL conservador:] apenas empieza la transacción, toma todos los locks que necesita de forma atómica. Si no puede tomar todos, espera. Evita deadlocks
+\end{description}
 
-Locks
+\subsection{Timestamping}
 
-Timestamping
+En vez de usar locks, cada registro tiene el timestamp de la última modificación y lectura.
+Cada transacción tiene su propio timestamp.
+La idea es darse cuenta si la transacción llegó ``muy tarde'' a leer o escribir el registro (y en tal caso abortar).
 
-Timestamping con multiversion: busca evitar \textbf{read too late}, al escribir no se pisa el registro sino que se crea una nueva versión y se le asigna un timestamp. Asi, si una transacción más vieja quiere leer un registro que fue escrito por una transacción mas nueva, puede leer la versión correspondiente. No evita aborts en cascada ni write too late.
+\textbf{Timestamping con multiversion:} busca evitar \textbf{read too late}, al escribir no se pisa el registro sino que se crea una nueva versión y se le asigna un timestamp.
+Asi, si una transacción más vieja quiere leer un registro que fue escrito por una transacción mas nueva, puede leer la versión correspondiente.
+No evita aborts en cascada ni write too late.
 
 Niveles Aislamiento en SQL (cada nivel es más estricto que los anteriores):
 
